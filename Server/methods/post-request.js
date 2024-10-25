@@ -7,7 +7,7 @@ export async function postReq(req,res){
             let body = await requestBodyParser(req);//kthen objekt, yay!
             // req.movies.push(body);
             // writeToFile(req.movies);
-            const [result] = await pool.query(
+            await pool.query(
                 `INSERT INTO person (Firstname, Surname, Birthday, Sex, Phone, Email, City, Street, AddressNr, Roli, _Password)
                 VALUES (?,?,?,?,?,?,?,?,?,?,?);
                 `,[

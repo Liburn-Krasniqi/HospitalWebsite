@@ -1,6 +1,8 @@
 import http from 'http';
 import {getReq} from './methods/get-request.js';
 import { postReq } from './methods/post-request.js';
+import { putReq } from './methods/put-request.js';
+import { deleteReq } from './methods/delete-request.js';
 import dotenv from 'dotenv';//automatic restart on save
 dotenv.config();
 

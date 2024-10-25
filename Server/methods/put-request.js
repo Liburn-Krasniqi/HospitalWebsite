@@ -4,30 +4,45 @@ import { pool } from "../database.js";
 export async function putReq(req,res){
     let baseUrl = req.url.substring(0, req.url.lastIndexOf("/"))
     let id = Number(req.url.split("/")[3]);
-    // const regexV4 = new RegExp(
-    //      /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    // );
     
-    if(req.url === "/api/movies" &&  !(typeof id ==='number')){
+    if(baseUrl === "/api/persons" &&  !(typeof id ==='number')){
         res.writeHead(404, {"Content-Type" : "application/json"});
         res.end(JSON.stringify({title: "Not Found", message: "Not a valid ID!"}));
-    }else if(baseUrl==="/api/movies" &&  (typeof id ==='number')){
+    }else if(baseUrl==="/api/persons" &&  (typeof id ==='number')){
         try{
             let body = await requestBodyParser(req);
             
-                //req.movies.splice(index, 1, body); //nashta bon qishtu??
-
+                await pool.query(`
+                    UPDATE person
+                    SET Firstname = ?, Surname = ?, Birthday = ?, Sex = ?, Phone = ?, Email = ?, City = ?, Street = ?, AddressNr = ?, Roli = ?, _Password = ?
+                    WHERE UserId = ?;
+                    `, [body.Firstname,
+                        body.Surname,
+                        body.Birthday,
+                        body.Sex,
+                        body.Phone,
+                        body.Email,
+                        body.City,
+                        body.Street,
+                        body.AddressNr,
+                        body.Roli,
+                        body._Password,
+                        id]);
                 res.writeHead(200, {"Content-Type": "application/json"});
-                res.end(JSON.stringify(req.movies[index]));
+                res.end(
+                    JSON.stringify({
+                    title: "Succesfull Put Request",
+                    message: "Entity Updated",
+                    }));
             }catch(err){
-            console.log(err);
-            res.writeHead(404, {"Content-Type" : "application/json"});
-            res.end(
-                JSON.stringify({
-                  title: "Validation Failed",
-                  message: "Request body is not valid",
-                })
-              );
+                console.log(err);
+                res.writeHead(404, {"Content-Type" : "application/json"});
+                res.end(
+                    JSON.stringify({
+                    title: "Validation Failed",
+                    message: "Request body is not valid",
+                    })
+                );
             }
     }
 };

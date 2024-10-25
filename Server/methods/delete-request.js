@@ -1,35 +1,38 @@
-const writeToFile = require("../util/write-to-file");
+import { pool } from "../database.js";
 
-module.exports = (req,res) => {
+export async function deleteReq(req,res){
     let baseUrl = req.url.substring(0, req.url.lastIndexOf("/"))
-    let id = req.url.split("/")[3];
-    const regexV4 = new RegExp(
-         /^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i
-    );
+    let id = Number(req.url.split("/")[3]);
     
-    if(!regexV4.test(id)){
+    if(!typeof id ==='number'){
         res.writeHead(404, {"Content-Type" : "application/json"});
         res.end(
             JSON.stringify({
             title: "Validation Failed",
-            message: "UUID is not valid!"
+            message: "ID is not valid!"
             })
         );
-    }else if(baseUrl === "/api/movies" && regexV4.test(id)){
-        const index = req.movies.findIndex((movie) => {
-            return movie.id === id;
-        });
-        if(index === -1){
-            res.statusCode = 404;
-            res.write(
-                JSON.stringify({ title: "Not Found", message: "Movie not found"})
-            );
-            res.end();
-        }else{
-            req.movies.splice(index, 1);
-            writeToFile(req.movies);
-            res.writeHead(204, {"Content-Type": "application/json"});
-            res.end(JSON.stringify(req.movies));
+    }else if(baseUrl==="/api/persons" &&  (typeof id ==='number')){
+        try{
+            await pool.query(`
+                DELETE FROM person
+                WHERE UserId = ?;
+                `,[id]);
+            res.writeHead(200, {"Content-Type": "application/json"});
+            res.end(
+                JSON.stringify({
+                title: "Succesfull Delete Request",
+                message: "Entity Removed",
+                }));
+        }catch(err){
+            console.log(err);
+            res.writeHead(404, {"Content-Type" : "application/json"});
+                res.end(
+                    JSON.stringify({
+                    title: "Validation Failed",
+                    message: "Request body is not valid",
+                    })
+                );
         }
     }else {
         res.writeHead(404, { "Content-Type": "application/json" });

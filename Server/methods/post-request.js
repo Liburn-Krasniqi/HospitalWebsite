@@ -1,23 +1,38 @@
-const crypto = require("crypto");
-const requestBodyParser = require("../util/body-parser");
-const writeToFile = require("../util/write-to-file");
+import { requestBodyParser } from "../util/body-parser.js";
+import { pool } from "../database.js";
 
-module.exports = async (req,res) => {
-    if(req.url === "/api/movies"){
+export async function postReq(req,res){
+    if(req.url === "/api/persons"){
         try{
-            let body = await requestBodyParser(req);
-            body.id = crypto.randomUUID();
-            req.movies.push(body);
-            writeToFile(req.movies);
+            let body = await requestBodyParser(req);//kthen objekt, yay!
+            // req.movies.push(body);
+            // writeToFile(req.movies);
+            const [result] = await pool.query(
+                `INSERT INTO person (Firstname, Surname, Birthday, Sex, Phone, Email, City, Street, AddressNr, Roli, _Password)
+                VALUES (?,?,?,?,?,?,?,?,?,?,?);
+                `,[
+                    body.Firstname,
+                    body.Surname,
+                    body.Birthday,
+                    body.Sex,
+                    body.Phone,
+                    body.Email,
+                    body.City,
+                    body.Street,
+                    body.AddressNr,
+                    body.Roli,
+                    body._Password
+                ]
+            );
             res.writeHead(201, {"Content-Type": "application/json"});
             res.end();
-            console.log("Request Body: ", body);
+            //console.log("Request Body: ", req);
         }catch(err){
             console.log(err);
             res.writeHead(404, {"Content-Type" : "application/json"});
                 res.end(JSON.stringify({
                     title: "Validation Failed",
-                    message: "UUID is not valid!"
+                    message: "Something is not valid!"
                     }));
         }
     }

@@ -1,18 +1,12 @@
 import http from 'http';
-// const getReq = require("./methods/get-request");
 import {getReq} from './methods/get-request.js';
-// const postReq = require("./methods/post-request");
-// const putReq = require("./methods/put-request");
-// const deleteReq = require("./methods/delete-request");
-///let movies = require("./data/movies.json");
-import dotenv from 'dotenv'
+import { postReq } from './methods/post-request.js';
+import dotenv from 'dotenv';//automatic restart on save
 dotenv.config();
-//require("dotenv").config()
 
 const PORT = process.env.PORT || 5001;//just in case
 
 const server = http.createServer((req,res) => {
-    //req.movies = movies;
     switch (req.method) {
         case "GET":
             getReq(req, res);
@@ -29,7 +23,7 @@ const server = http.createServer((req,res) => {
         default:
             res.statusCode = 404;
             res.setHeader("Content-Type", "application/json");
-            res.write(JSON.stringify({title: "Not Found", message: "Hello fggt, 404!"}));
+            res.write(JSON.stringify({title: "Not Found", message: "404!"}));
             res.end();   
     }
 });

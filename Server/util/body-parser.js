@@ -1,4 +1,4 @@
-module.exports = async (request) => {
+export async function requestBodyParser(request){
     return new Promise((resolve, reject) => {
         try{
             let body = "";

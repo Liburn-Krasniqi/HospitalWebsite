@@ -1,35 +1,32 @@
-import http from 'http';
-import {getReq} from './methods/get-request.js';
-import { postReq } from './methods/post-request.js';
-import { putReq } from './methods/put-request.js';
-import { deleteReq } from './methods/delete-request.js';
-import dotenv from 'dotenv';//automatic restart on save
+const express = require("express");
+const dotenv = require("dotenv");
 dotenv.config();
 
-const PORT = process.env.PORT || 5001;//just in case
+//const cors = require("cors");
 
-const server = http.createServer((req,res) => {
-    switch (req.method) {
-        case "GET":
-            getReq(req, res);
-        break;
-        case "POST":
-            postReq(req, res);
-        break;
-        case "PUT":
-            putReq(req, res);
-        break;
-        case "DELETE":
-            deleteReq(req, res);
-        break;
-        default:
-            res.statusCode = 404;
-            res.setHeader("Content-Type", "application/json");
-            res.write(JSON.stringify({title: "Not Found", message: "404!"}));
-            res.end();   
-    }
+const app = express();
+
+//var corsOptions = {
+//   origin: "http://localhost:8081"
+//  };
+
+//app.use(cors(corsOptions));
+
+app.use(express.json());//me qita e hjekum qafe parserin ig?
+
+app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+    res.json({ message: "Welcome" });
 });
 
-server.listen(PORT, ()=> {
-    console.log(`Server running on port:${PORT}`);
+require("./Server/routes/persons.routes.js")(app);
+
+require("./Server/routes/services.routes.js")(app);
+
+//complete the persons controller model and router then add another route controller and model to smth else
+//after that use an ORM just for shits and gigles
+const PORT = process.env.PORT || 8080;
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
 });

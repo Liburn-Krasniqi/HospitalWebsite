@@ -1,5 +1,7 @@
-const sql = require("../database.js");
+const { PrismaClient } = require('@prisma/client')
 
+const prisma = new PrismaClient()
+//is this direcrory even needed?? pe lo qitu per momentin ig
 // constructor
 const Service = function(service) {
     this.ServiceName = service.ServiceName;

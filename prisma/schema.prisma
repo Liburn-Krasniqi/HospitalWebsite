@@ -1,0 +1,220 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admission {
+  AdmissionID    Int             @id
+  PatientID      Int?
+  RoomID         Int?
+  AdmissionDate  DateTime?       @db.Date
+  ReleaseDate    DateTime?       @db.Date
+  patient        patient?        @relation(fields: [PatientID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "admission_ibfk_1")
+  admission_room admission_room? @relation(fields: [RoomID], references: [RoomID], onDelete: NoAction, onUpdate: NoAction, map: "admission_ibfk_2")
+
+  @@index([PatientID], map: "PatientID")
+  @@index([RoomID], map: "RoomID")
+}
+
+model admission_room {
+  RoomID     Int         @id
+  Nr_of_Beds Int?
+  admission  admission[]
+  room       room        @relation(fields: [RoomID], references: [RoomID], onDelete: NoAction, onUpdate: NoAction, map: "admission_room_ibfk_1")
+  nurse      nurse[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model appointmentbooking {
+  DoctorID  Int
+  PatientID Int
+  StartTime DateTime  @db.DateTime(0)
+  EndTime   DateTime? @db.DateTime(0)
+  doctor    doctor    @relation(fields: [DoctorID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "appointmentbooking_ibfk_1")
+  patient   patient   @relation(fields: [PatientID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "appointmentbooking_ibfk_2")
+
+  @@id([DoctorID, PatientID, StartTime])
+  @@index([PatientID], map: "PatientID")
+}
+
+model bill {
+  ReportID  Int
+  ServiceID Int
+  PatientID Int?
+  report    report   @relation(fields: [ReportID], references: [ReportID], onDelete: NoAction, onUpdate: NoAction, map: "bill_ibfk_1")
+  service   service  @relation(fields: [ServiceID], references: [ServiceID], onDelete: NoAction, onUpdate: NoAction, map: "bill_ibfk_2")
+  patient   patient? @relation(fields: [PatientID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "bill_ibfk_3")
+
+  @@id([ReportID, ServiceID])
+  @@index([PatientID], map: "PatientID")
+  @@index([ServiceID], map: "ServiceID")
+}
+
+model dean {
+  UserID Int   @id
+  staff  staff @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "dean_ibfk_1")
+}
+
+model department {
+  DepartmentID  Int     @id @default(autoincrement())
+  DeptName      String? @db.VarChar(100)
+  TheOverlooker Int?
+  doctor        doctor? @relation(fields: [TheOverlooker], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "department_ibfk_1")
+  room          room[]
+
+  @@index([TheOverlooker], map: "TheOverlooker")
+}
+
+model doctor {
+  UserID             Int                  @id
+  Qualification      String               @db.VarChar(255)
+  Departamenti       String               @db.VarChar(55)
+  ManagerID          Int?
+  appointmentbooking appointmentbooking[]
+  department         department[]
+  staff              staff                @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "doctor_ibfk_1")
+  doctor             doctor?              @relation("doctorTodoctor", fields: [ManagerID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "doctor_ibfk_2")
+  other_doctor       doctor[]             @relation("doctorTodoctor")
+  operating_room     operating_room[]
+  operationbooking   operationbooking[]
+  report             report[]
+
+  @@index([ManagerID], map: "ManagerID")
+}
+
+model medication {
+  MedicationID    Int               @id @default(autoincrement())
+  MedicationName  String?           @db.VarChar(100)
+  Category        String?           @db.VarChar(100)
+  sets_medication sets_medication[]
+}
+
+model nurse {
+  UserID         Int             @id
+  Category       String          @db.VarChar(55)
+  Admission_Room Int?
+  staff          staff           @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "nurse_ibfk_1")
+  admission_room admission_room? @relation(fields: [Admission_Room], references: [RoomID], onDelete: NoAction, onUpdate: NoAction, map: "nurse_ibfk_2")
+
+  @@index([Admission_Room], map: "Admission_Room")
+}
+
+model operating_room {
+  RoomID           Int                @id
+  TheOverlooker    Int?
+  doctor           doctor?            @relation(fields: [TheOverlooker], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "operating_room_ibfk_1")
+  room             room               @relation(fields: [RoomID], references: [RoomID], onDelete: NoAction, onUpdate: NoAction, map: "operating_room_ibfk_2")
+  operationbooking operationbooking[]
+
+  @@index([TheOverlooker], map: "TheOverlooker")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model operationbooking {
+  DoctorID       Int
+  RoomID         Int
+  StartTime      DateTime       @db.DateTime(0)
+  EndTime        DateTime?      @db.DateTime(0)
+  doctor         doctor         @relation(fields: [DoctorID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "operationbooking_ibfk_1")
+  operating_room operating_room @relation(fields: [RoomID], references: [RoomID], onDelete: NoAction, onUpdate: NoAction, map: "operationbooking_ibfk_2")
+
+  @@id([DoctorID, RoomID, StartTime])
+  @@index([RoomID], map: "RoomID")
+}
+
+model patient {
+  UserID             Int                  @id
+  admission          admission[]
+  appointmentbooking appointmentbooking[]
+  bill               bill[]
+  person             person               @relation(fields: [UserID], references: [UserID], onDelete: Cascade, onUpdate: NoAction, map: "patient_ibfk_1")
+  report             report[]
+}
+
+model person {
+  UserID    Int          @id @default(autoincrement())
+  Firstname String       @db.VarChar(50)
+  Surname   String       @db.VarChar(50)
+  Birthday  DateTime     @db.Date
+  Sex       person_Sex?
+  Phone     String?      @db.VarChar(20)
+  Email     String?      @unique(map: "Email") @db.VarChar(100)
+  City      String?      @db.VarChar(50)
+  Street    String?      @db.VarChar(100)
+  AddressNr Int?
+  Roli      person_Roli? @default(user)
+  Password  String?      @map("_Password") @db.Char(8)
+  patient   patient?
+  staff     staff?
+}
+
+model report {
+  ReportID        Int               @id @default(autoincrement())
+  ReportDate      DateTime          @db.Date
+  DoctorID        Int?
+  PatientID       Int?
+  Diagnosis       String?           @db.VarChar(255)
+  bill            bill[]
+  doctor          doctor?           @relation(fields: [DoctorID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "report_ibfk_1")
+  patient         patient?          @relation(fields: [PatientID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "report_ibfk_2")
+  sets_medication sets_medication[]
+
+  @@index([DoctorID], map: "DoctorID")
+  @@index([PatientID], map: "PatientID")
+}
+
+model room {
+  RoomID         Int             @id @default(autoincrement())
+  DeptId         Int?
+  admission_room admission_room?
+  operating_room operating_room?
+  department     department?     @relation(fields: [DeptId], references: [DepartmentID], onDelete: NoAction, onUpdate: NoAction, map: "room_ibfk_1")
+
+  @@index([DeptId], map: "DeptId")
+}
+
+model service {
+  ServiceID   Int      @id @default(autoincrement())
+  ServiceName String?  @db.VarChar(100)
+  Price       Decimal? @db.Decimal(10, 2)
+  bill        bill[]
+}
+
+model sets_medication {
+  ReportID     Int
+  MedicationID Int
+  report       report     @relation(fields: [ReportID], references: [ReportID], onDelete: NoAction, onUpdate: NoAction, map: "sets_medication_ibfk_1")
+  medication   medication @relation(fields: [MedicationID], references: [MedicationID], onDelete: NoAction, onUpdate: NoAction, map: "sets_medication_ibfk_2")
+
+  @@id([ReportID, MedicationID])
+  @@index([MedicationID], map: "MedicationID")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model staff {
+  UserID        Int       @id
+  Salary        Int?
+  StartShift    DateTime? @db.Time(0)
+  EndShift      DateTime? @db.Time(0)
+  AvailableDays String?
+  dean          dean?
+  doctor        doctor?
+  nurse         nurse?
+  person        person    @relation(fields: [UserID], references: [UserID], onDelete: NoAction, onUpdate: NoAction, map: "staff_ibfk_1")
+}
+
+enum person_Sex {
+  M
+  F
+}
+
+enum person_Roli {
+  user
+  doctor
+  dean
+  nurse
+}

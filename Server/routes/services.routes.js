@@ -4,7 +4,13 @@ module.exports = app => {
     var router = require("express").Router();
   
     // Retrieve all Tutorials
-    router.get("/", services.findAll);
+    router.post("/", services.create);
+    
+    router.get("/", services.read);
+
+    router.put("/",services.update);
+
+    router.delete("/",services.delete);
   
     app.use('/api/services', router);
   };

@@ -24,6 +24,8 @@ require("./Server/routes/persons.routes.js")(app);
 
 require("./Server/routes/services.routes.js")(app);
 
+require("./Server/routes/patients.routes.js")(app);
+
 //complete the persons controller model and router then add another route controller and model to smth else
 //after that use an ORM just for shits and gigles
 const PORT = process.env.PORT || 8080;

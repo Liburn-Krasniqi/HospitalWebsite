@@ -5,6 +5,8 @@ import CustomModal from '../../Components/UI/CustomModal';
 import RoomsEditForm from './RoomsEditForm';
 
 const RoomsList = () => {
+  console.log("component rendered Room list");
+
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
   const [alert, setAlert] = useState(false);
@@ -21,9 +23,7 @@ const RoomsList = () => {
     setRoomEditId(id);
   };
 
-  // const handleRoomEdit = () => {
-
-  // }
+  // const handleRoomEdit=()=>{}
 
   const handleRoomDelete = (id) => {
     fetch(`http://localhost:5000/api/rooms?RoomID=${id}`, {
@@ -69,7 +69,7 @@ const RoomsList = () => {
       setLoading(false);
       setData(rooms);
     });
-  },[data]);
+  },[]);
 
   const columns = ['RoomID','DeptId'];  
 

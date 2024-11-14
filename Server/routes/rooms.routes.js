@@ -4,7 +4,24 @@ module.exports = app => {
     var router = require("express").Router();
     
     router.post("/", rooms.create);
-
+ /** GET Methods */
+    /**
+     * @openapi
+     * '/api/rooms':
+     *  get:
+     *     tags:
+     *     - Room Controller
+     *     summary: Get all rooms
+     *     responses:
+     *      200:
+     *        description: Fetched Successfully
+     *      400:
+     *        description: Bad Request
+     *      404:
+     *        description: Not Found
+     *      500:
+     *        description: Server Error
+     */
     router.get("/", rooms.read);
 
     router.put("/", rooms.update);

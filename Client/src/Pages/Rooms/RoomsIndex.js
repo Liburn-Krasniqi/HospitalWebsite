@@ -9,7 +9,7 @@ import RoomsList from "./RoomsList";
 
 function RoomsIndex() {
   const [showForm, setShowForm] = useState(false);
-
+  console.log("component rendered Room Index");
   const handleFormClose = () => {
     setShowForm(false);
   };

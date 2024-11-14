@@ -1,14 +1,20 @@
 const express = require("express");
 const dotenv = require("dotenv");
+
+const swaggerDocs = require('./swagger.js');
+
+// const swaggerjsdoc = require("swagger-jsdoc");
+// const swaggerUi = require("swagger-ui-express");
+
 dotenv.config();
 
 const cors = require("cors");
 
-const app = express();
-
 var corsOptions = {
   origin: "http://localhost:3000" //per siguri demek
- };
+};
+
+const app = express();
 
 app.use(cors(corsOptions));
 
@@ -30,7 +36,15 @@ require("./Server/routes/rooms.routes.js")(app);
 
 //complete the persons controller model and router then add another route controller and model to smth else
 //after that use an ORM just for shits and gigles
+
+
+
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+  try{
+    swaggerDocs.swaggerDocs(app, PORT);
+    console.log(`Server is running on port ${PORT}.`);
+  }catch(err){
+    console.log(err);
+  }
 });

@@ -3,9 +3,7 @@ import CustomForm from '../../Components/Custom/CustomForm';
 
 const RoomsForm = (props) => {
   const [formData, setFormData] = useState({
-    id: '',
-    floor: '',
-    type: '',
+    DeptId: ''
   });
 
   const handleFormSubmit = () => {

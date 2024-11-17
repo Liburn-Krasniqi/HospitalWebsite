@@ -34,6 +34,8 @@ require("./Server/routes/patients.routes.js")(app);
 
 require("./Server/routes/rooms.routes.js")(app);
 
+require("./Server/routes/departments.routes.js")(app);
+
 //complete the persons controller model and router then add another route controller and model to smth else
 //after that use an ORM just for shits and gigles
 

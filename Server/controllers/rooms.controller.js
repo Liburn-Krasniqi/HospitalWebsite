@@ -4,16 +4,17 @@ const Joi = require('joi');
 const prisma = new PrismaClient()
 
 const schema = Joi.object({
-  DeptId: Joi.number().positive(),//kom mujt edhe mos me pas si object. 
+  DeptId: [Joi.number().positive(), Joi.allow(null)]//kom mujt edhe mos me pas si object. 
 });
 
 exports.create = async (req,res) => {
   const body = req.body;
   try{
+      let deptid;
       const value = await schema.validateAsync(body);
       const room = await prisma.room.create({
         data: {
-          DeptId: Number(body.DeptId),
+          DeptId: deptid,
       },
     })
     res.statusCode = 201;
@@ -36,7 +37,14 @@ exports.read = async (req, res) => {
         {
           RoomID: 'asc',
         }
-      ]
+      ],
+      include: {
+        department: {
+            select: {
+              DeptName: true,
+            }
+        },
+      }
     });
     
     res.statusCode = 200;
@@ -55,6 +63,7 @@ exports.read = async (req, res) => {
 exports.update = async (req,res) => {
   const body = req.body;
   try{
+    const value = await schema.validateAsync(body);
     const room = await prisma.room.update({
       where: {
         RoomID: Number(req.query.RoomID)
@@ -77,6 +86,7 @@ exports.delete = async (req,res) => {
   
   try{
     let rooms;
+    console.log(req.query.RoomID)
     if(req.query.RoomID != null){
       rooms = await prisma.room.delete({
         where: {RoomID: Number(req.query.RoomID)}

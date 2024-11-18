@@ -87,7 +87,7 @@ module.exports = app => {
 /** DELETE Methods */
     /**
      * @openapi
-     * '/api/rooms?RoomID={roomID}':
+     * '/api/rooms?RoomID={roomId}':
      *  delete:
      *     tags:
      *     - Room Controller
